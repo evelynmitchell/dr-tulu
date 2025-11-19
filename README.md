@@ -10,11 +10,14 @@
 
 DR Tulu-8B is the first open Deep Research (DR) model trained for long-form DR tasks. DR Tulu-8B matches OpenAI DR on long-form DR benchmarks.
 
----
-
 <div align="center">
 <img src="assets/dr-tulu.png" alt="DR Tulu Overview" width="800"/>
 </div>
+
+---
+
+## Release Notes 
+- November 19, 2025: Initial code release. 
 
 ## Overview
 
@@ -22,7 +25,7 @@ This repository contains two main components:
 
 - **[`agent/`](agent/)**: Agent library (`dr-agent-lib`) with MCP-based tool backend, high-concurrency async request management, and flexible prompting interface for developing and training deep research agents.
 
-- **[`rl/`](rl/)**: RL training code based on [Open-Instruct](https://github.com/allenai/open-instruct) for training deep research agents with GRPO and evolving rubrics.
+- **[`rl/`](rl/open-instruct/)**: RL training code based on [Open-Instruct](https://github.com/allenai/open-instruct) for training deep research agents with GRPO and evolving rubrics.
 
 For detailed setup and usage instructions, see the README files in each subdirectory.
 
@@ -34,7 +37,7 @@ DR Tulu is provided by The Allen Institute for Artificial Intelligence (Ai2). Th
 
 ---
 
-## Citation
+## Citation and Contact
 
 If you find our work useful, please cite:
 
@@ -51,3 +54,4 @@ If you find our work useful, please cite:
   note         = {Preprint},
 }
 ```
+If you have any questions, contact [Rulin Shao](https://rulinshao.github.io/) or open a github issue. 
