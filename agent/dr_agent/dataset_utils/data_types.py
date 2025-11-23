@@ -10,6 +10,9 @@ class DatasetConfig(TypedDict):
     subset: Optional[str]
     # Optional: Dataset subset (e.g., 'hard', 'consensus' for healthbench)
 
+    local_path: Optional[str]
+    # Optional: Local path to dataset file (if not provided, will download from URL)
+
 
 class DatasetInstance(TypedDict):
     id: str
