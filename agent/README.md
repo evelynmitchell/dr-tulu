@@ -128,42 +128,9 @@ Examples:
 
 ## Evaluation
 
-### SQA-CS-V2
+This repository includes evaluation scripts for multiple benchmarks, including:
+- **Long-form**: SQA-CS-V2, Deep Research Bench, ResearchQA, HealthBench
+- **Domain-specific**: Genetic Diseases  
+- **Short-form**: BrowseComp, SimpleQA, Short Form QA
 
-1. SQA-CS-V2 requires a response to be in a json format as below:
-
-```json
-{
-  "sections": [
-    {
-      "text": "text of section 1",
-      "citations": {
-        "id": "cite 1 of sec 1",
-        "snippets": [
-          "evidence 1",
-          "evidence 2"
-        ]
-      }
-    },
-    {
-      "text": "text of section 2",
-      "citations": {
-        "id": "cite 1 of sec 2",
-        "snippets": [
-          "List of evidence"
-        ]
-      }
-    }
-  ]
-}
-```
-The following command can be used to convert the output of DR Tulu models: 
-```bash
-python evaluation/sqa_eval/convert_to_asta_format.py --folder <folder_name> --file <file_name>
-```
-2. Clone the following repo: https://github.com/allenai/agent-baselines
-3. Run the following command:
-```bash
-uv run --extra sqa inspect eval astabench/sqa --display plain --solver agent_baselines/solvers/sqa/debug/cached_solver.py -S path=<outputfile_from_step1> -T split=test -T with_search_tools=False --display=plain -T simplified_eval=true -T assess_jointly=true --max-connections 16 -T sentence_wise_cit_eval=false -T all_at_once=true -T scorer_model="google/gemini-2.5-flash"
-```
-Note you have to export GOOGLE_API_KEY and HF_TOKEN. If there are errors asking for any other tokens, you can enter a dummy value. 
+For detailed evaluation instructions, benchmark descriptions, and usage examples, see [`evaluation/README.md`](evaluation/README.md). 
