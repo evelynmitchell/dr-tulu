@@ -14,7 +14,7 @@ from huggingface_hub import hf_hub_download
 from .data_types import DatasetConfig
 
 SUPPORTED_TASKS = {
-    "genetic_diseases_qa": "parkmoll/genetic-variants-qa",
+    "genetic_diseases_qa": "rl-research/genetic_diseases_qa",
     "deep_scholar_bench": "xinranz3/deepscholar_bench_fixed",
     "deep_research_bench": "rl-research/deep_research_bench_eval",
     "sqav2": "allenai/asta-bench",
@@ -73,7 +73,7 @@ def get_ablation_sample_size(benchmark: str, subset_name: str = None) -> int:
         "deep_scholar_bench": 63,
         "deep_research_bench": 100,
         "sqav2": 100,
-        "genetic_diseases_qa": 100,
+        "genetic_diseases_qa": 47,
         "2wiki": 100,
         "webwalker": 680,
     }
@@ -361,7 +361,7 @@ def load_genetic_diseases_qa_data(
         dataset_repo, data_files="question_types.json", split="train"
     )
     rare_variants_data = datasets.load_dataset(
-        dataset_repo, data_files="rare_variants_qa.json", split="train"
+        dataset_repo, data_files="genetic_diseases_qa.json", split="train"
     )
 
     question_types = question_types_data[0]
@@ -374,11 +374,15 @@ def load_genetic_diseases_qa_data(
         template = question_types[question_type]["template"]
         problem = template.replace("{variant}", variant)
 
+        general_rubrics = question_types[question_type]["rubrics"]
+        instance_rubrics = example["rubrics"]
+
         examples.append(
             {
                 "id": hashlib.md5(problem.encode()).hexdigest(),
                 "problem": problem,
                 "additional_instructions": "",
+                "rubrics": general_rubrics + instance_rubrics
             }
         )
 

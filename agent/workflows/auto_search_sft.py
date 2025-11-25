@@ -91,7 +91,7 @@ class SearchAgent(BaseAgent):
             "hle",
         ]:
             instruction_field_name = "exact_answer"
-        elif dataset_name in ["sqav2"]:
+        elif dataset_name in ["sqav2", "genetic_diseases_qa"]:
             instruction_field_name = "long_form"
         elif dataset_name in ["healthbench", "deep_research_bench", "researchqa"]:
             instruction_field_name = "short_form"
@@ -165,7 +165,7 @@ class AnswerAgent(BaseAgent):
             "webwalker",
         ]:
             instruction_field_name = "exact_answer"
-        elif dataset_name in ["sqav2"]:
+        elif dataset_name in ["sqav2", "genetic_diseases_qa"]:
             instruction_field_name = "long_form"
         elif dataset_name in ["healthbench", "deep_research_bench", "researchqa"]:
             instruction_field_name = "short_form"

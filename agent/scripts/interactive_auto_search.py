@@ -623,7 +623,14 @@ def chat(
             configuration=config,
             **overrides
         )
-        console.print(f"[green]Loaded workflow from: {config}[/green]\n")
+        # Show relative path for cleaner output
+        config_path = Path(config)
+        try:
+            rel_path = config_path.relative_to(Path.cwd())
+        except ValueError:
+            # If path is not relative to cwd, just show the name
+            rel_path = config_path
+        console.print(f"[green]Loaded workflow from: {rel_path}[/green]\n")
     except Exception as e:
         console.print(f"[bold red]Failed to create workflow: {e}[/bold red]")
         if verbose:

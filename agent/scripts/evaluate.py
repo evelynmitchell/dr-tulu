@@ -28,6 +28,7 @@ from evaluation.browse_comp_eval.browsecomp_eval import BrowseCompEval
 from evaluation.health_bench_eval.healthbench_eval import HealthBenchEval
 from evaluation.research_qa_eval.compute_coverage import compute_coverage
 from evaluation.research_qa_eval.researchqa_eval import ResearchQAEval
+from evaluation.genetic_diseases_eval.genetic_diseases_eval import GeneticDiseasesEval
 from evaluation.research_qa_eval.researchqa_loader import download_researchqa_dataset
 from evaluation.samplers.sampler.chat_completion_sampler import (
     OPENAI_SYSTEM_MESSAGE_API,
@@ -48,20 +49,21 @@ def load_jsonl(file_path):
     return data
 
 
-def convert_to_evaluate_format(original_examples):
+def convert_to_evaluate_format(original_examples, add_traces: bool = False):
     """Convert original examples to evaluation format"""
     converted_examples = []
     for ele in original_examples:
-        converted_examples.append(
-            {
-                "id": ele["example_id"],
-                "row": ele["original_data"],
-                "response_text": ele["final_response"],
-                "actual_queried_prompt_messages": [
-                    {"content": ele["problem"], "role": "user"}
-                ],
-            }
-        )
+        example = {
+            "id": ele["example_id"],
+            "row": ele["original_data"],
+            "response_text": ele["final_response"],
+            "actual_queried_prompt_messages": [
+                {"content": ele["problem"], "role": "user"}
+            ],
+        }
+        if add_traces:
+            example["full_traces"] = ele["full_traces"]
+        converted_examples.append(example)
 
     return converted_examples
 
@@ -116,6 +118,53 @@ def evaluate_researchqa(
 
     with open(results_path, "w") as f:
         json.dump(results_data, f, indent=2, default=str)
+
+
+def evaluate_genetic_disease_qa(
+    file_path: str,
+    save_path: str,
+    run_mode: str,
+    grader_model: str ="gpt-4.1-2025-04-14",
+    debug: bool = False,
+):
+    task = "genetic_qa"
+    converted_examples = load_jsonl(file_path)
+    if "original_data" in converted_examples[0].keys():
+        converted_examples = convert_to_evaluate_format(converted_examples, add_traces=True)
+    if debug:
+        converted_examples = converted_examples[:1]
+    print(f"Loaded {len(converted_examples)} examples")
+
+    grader_sampler = ChatCompletionSampler(
+        model=grader_model,
+        system_message=OPENAI_SYSTEM_MESSAGE_API,
+        max_tokens=1000,
+        temperature=0,
+    )
+    # must specify run_mode, as citation format differs across models
+    eval_class = GeneticDiseasesEval(grader_model=grader_sampler, run_mode=run_mode)
+
+    # Setup save path
+    input_dir = Path(file_path).parent
+    input_name = Path(file_path).stem  # filename without extension
+    results_path = save_path if save_path is not None else input_dir / f"{input_name}_eval_results.json"
+    
+    # Run evaluation
+    eval_results = eval_class.evaluate(converted_examples)
+    final_result = common.aggregate_results(eval_results)
+
+    save_evaluation_results(
+        str(results_path), task, run_mode, final_result, converted_examples
+    )
+
+    # Print summary
+    print(f"\nEvaluation Summary:")
+    print(f"Task: {task}")
+    print(f"Examples: {len(converted_examples)}")
+    print(f"Score: {final_result.score:.3f}")
+    print(f"Results saved to: {results_path}")
+
+    return final_result
 
 
 def save_evaluation_results(
@@ -239,6 +288,11 @@ def main():
         help="Model to use for grading (default: gpt-4o-mini)",
     )
     parser.add_argument(
+        "--run_mode",
+        default="auto_reason_search",
+        help="Name of run mode used to generate response (specific to genetic diseases qa)",
+    )
+    parser.add_argument(
         "--debug",
         action="store_true",
         help="Run in debug mode",
@@ -259,6 +313,16 @@ def main():
             args.file_path,
             args.save_path,
             grader_model="gpt-4.1-mini-2025-04-14",  # hardcode for researchqa
+        )
+    elif args.task == "genetic_diseases_qa":
+        # Must pass in the run_mode here so we know how to parse the
+        # citation sources for evaluation
+        evaluate_genetic_disease_qa(
+            args.file_path,
+            args.save_path,
+            args.run_mode,
+            grader_model=args.grader_model,
+            debug=args.debug,
         )
     else:
         run_evaluation(
