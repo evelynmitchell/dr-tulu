@@ -122,7 +122,7 @@ Return just the json object in markdown format. Do not include any other text in
 
 def get_citation_map(gen_data: dict, run_mode: str) -> dict[str, str]:
     print(f"Using run mode {run_mode} to process citations")
-    if run_mode == "auto_search_sft":
+    if run_mode == "auto_search_sft" or run_mode == "auto_reason_search":
         full_trace = gen_data["full_traces"]["generated_text"]
         # generated texts contain direct tool outputs as <snippet>...</snippet> tags
         search_pattern = re.compile(r'<snippet\s+id=([a-zA-Z0-9\-]+)>(.*?)</snippet>', re.DOTALL)
