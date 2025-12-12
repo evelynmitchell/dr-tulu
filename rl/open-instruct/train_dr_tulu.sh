@@ -8,6 +8,9 @@ exp_name="dr-tulu-rl-1node"
 # you need all these apis by default. Store them in your .env file.
 # export WANDB_API_KEY=xxx
 # export OPENAI_API_KEY=xxx
+# export SERPER_API_KEY=xxx
+# export S2_API_KEY=xxx
+# export JINA_API_KEY=xxx (if you use jina)
 # export CRAWL4AI_API_URL=xxx (if you use crawl4ai)
 # if using the docker container and crawl4ai, you can use this path.
 # Otherwise, you need to set the path to the blocklist file.
